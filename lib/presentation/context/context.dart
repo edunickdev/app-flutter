@@ -8,3 +8,11 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 
 final modeProvider = StateProvider<bool>((ref) => false);
 final colorProvider = StateProvider<int>((ref) => 0);
+
+final countriesProvider = StateProvider<List<String>>((ref) => []);
+final departmentsProvider = StateProvider<List<String>>((ref) => []);
+final municipalitiesProvider = StateProvider<List<String>>((ref) => []);
+
+final countrySelectedProvider = StateProvider<String?>((ref) => null);
+final departmentSelectedProvider = StateProvider<String?>((ref) => null);
+final municipalitySelectedProvider = StateProvider<String?>((ref) => null);

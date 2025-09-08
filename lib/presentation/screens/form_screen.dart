@@ -1,13 +1,15 @@
 import 'package:doublevpartnersapp/presentation/components/custom_appbar_widget.dart';
 import 'package:doublevpartnersapp/presentation/components/custom_button_widget.dart';
+import 'package:doublevpartnersapp/presentation/context/context.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FormScreen extends StatelessWidget {
+class FormScreen extends ConsumerWidget {
   const FormScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
     final key = GlobalKey<FormState>();
 
@@ -19,7 +21,16 @@ class FormScreen extends StatelessWidget {
       }
     }
 
-    List<String> tags = [];
+    String? validateNotEmpty(String? value) {
+      if (value == null || value.isEmpty) {
+        return 'El campo no puede estar vacío';
+      }
+      return null;
+    }
+
+    final countries = ref.watch(countriesProvider);
+    final departments = ref.watch(departmentsProvider);
+    final municipalities = ref.watch(municipalitiesProvider);
 
     return Scaffold(
       appBar: HomeAppBar(title: 'Formulario'),
@@ -37,12 +48,7 @@ class FormScreen extends StatelessWidget {
                   hintText: 'Ingrese sus nombres',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'El campo no puede estar vacío';
-                  }
-                  return null;
-                },
+                validator: (value) => validateNotEmpty(value),
               ),
               SizedBox(height: size.height * 0.02),
               TextFormField(
@@ -51,28 +57,56 @@ class FormScreen extends StatelessWidget {
                   hintText: 'Ingrese sus apellidos',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'El campo no puede estar vacío';
-                  }
-                  return null;
-                },
+                validator: (value) => validateNotEmpty(value),
               ),
-              DropdownSearch<String>.multiSelection(
-                selectedItems: tags,
-                items: (f, _) async => ['UI', 'Backend', 'Cloud', 'RPA'],
+              SizedBox(height: size.height * 0.02),
+              DropdownSearch<String>(
+                items: (filter, loadProps) => countries,
+                selectedItem: ref.watch(countrySelectedProvider),
                 autoValidateMode: AutovalidateMode.onUserInteraction,
-                validator: (values) => (values == null || values.isEmpty)
-                    ? 'Elige al menos 1 etiqueta'
-                    : null,
-                onChanged: (vals) => tags = vals,
-                onSaved: (vals) => tags = vals ?? [],
-                popupProps: const PopupPropsMultiSelection.menu(
-                  showSearchBox: true,
-                ),
+                validator: (value) =>
+                    value == null ? 'Seleccione un país' : null,
+                onChanged: (value) =>
+                    ref.read(countrySelectedProvider.notifier).state = value,
+                popupProps: const PopupProps.menu(showSearchBox: true),
                 decoratorProps: DropDownDecoratorProps(
                   decoration: const InputDecoration(
-                    labelText: 'Etiquetas',
+                    labelText: 'País',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              DropdownSearch<String>(
+                items: (filter, loadProps) => departments,
+                selectedItem: ref.watch(departmentSelectedProvider),
+                autoValidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) =>
+                    value == null ? 'Seleccione un departamento' : null,
+                onChanged: (value) =>
+                    ref.read(departmentSelectedProvider.notifier).state = value,
+                popupProps: const PopupProps.menu(showSearchBox: true),
+                decoratorProps: DropDownDecoratorProps(
+                  decoration: const InputDecoration(
+                    labelText: 'Departamento',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.02),
+              DropdownSearch<String>(
+                items: (filter, loadProps) => municipalities,
+                selectedItem: ref.watch(municipalitySelectedProvider),
+                autoValidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) =>
+                    value == null ? 'Seleccione un municipio' : null,
+                onChanged: (value) =>
+                    ref.read(municipalitySelectedProvider.notifier).state =
+                        value,
+                popupProps: const PopupProps.menu(showSearchBox: true),
+                decoratorProps: DropDownDecoratorProps(
+                  decoration: const InputDecoration(
+                    labelText: 'Municipio',
                     border: OutlineInputBorder(),
                   ),
                 ),
