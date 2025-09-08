@@ -1,4 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:doublevpartnersapp/repository/db/app_database.dart';
 
-final mode = StateProvider<bool>((ref) => false);
-final color = StateProvider<int>((ref) => 0);
+final databaseProvider = Provider<AppDatabase>((ref) {
+  ref.onDispose(AppDatabase.instance.close);
+  return AppDatabase.instance;
+});
+
+final modeProvider = StateProvider<bool>((ref) => false);
+final colorProvider = StateProvider<int>((ref) => 0);

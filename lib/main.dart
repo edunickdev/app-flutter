@@ -14,8 +14,8 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentColor = ref.watch(color);
-    final currentMode = ref.watch(mode);
+    final currentColor = ref.watch(colorProvider);
+    final currentMode = ref.watch(modeProvider);
 
     return MaterialApp.router(
       routerConfig: routes,

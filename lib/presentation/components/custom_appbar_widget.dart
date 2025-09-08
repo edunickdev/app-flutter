@@ -20,7 +20,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDarkMode = ref.watch(mode);
+    final isDarkMode = ref.watch(modeProvider);
 
     return AppBar(
       title: Text(title),
@@ -32,7 +32,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 : 'Cambiar a modo oscuro',
             icon: Icon(isDarkMode ? Icons.dark_mode : Icons.sunny),
             onPressed: () {
-              ref.read(mode.notifier).state = !isDarkMode;
+              ref.read(modeProvider.notifier).state = !isDarkMode;
             },
           ),
         if (showColorMenu) const _ColorMenu(),
@@ -50,7 +50,7 @@ class _ColorMenu extends ConsumerWidget {
       tooltip: 'Elegir color',
       icon: const Icon(Icons.color_lens),
       onSelected: (int value) {
-        ref.read(color.notifier).state = value;
+        ref.read(colorProvider.notifier).state = value;
       },
       itemBuilder: (BuildContext context) {
         final total = colors.length;

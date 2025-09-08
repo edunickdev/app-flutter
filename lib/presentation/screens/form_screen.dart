@@ -1,5 +1,6 @@
 import 'package:doublevpartnersapp/presentation/components/custom_appbar_widget.dart';
 import 'package:doublevpartnersapp/presentation/components/custom_button_widget.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
 class FormScreen extends StatelessWidget {
@@ -17,6 +18,8 @@ class FormScreen extends StatelessWidget {
         ).showSnackBar(const SnackBar(content: Text('Procesando datos')));
       }
     }
+
+    List<String> tags = [];
 
     return Scaffold(
       appBar: HomeAppBar(title: 'Formulario'),
@@ -55,8 +58,27 @@ class FormScreen extends StatelessWidget {
                   return null;
                 },
               ),
+              DropdownSearch<String>.multiSelection(
+                selectedItems: tags,
+                items: (f, _) async => ['UI', 'Backend', 'Cloud', 'RPA'],
+                autoValidateMode: AutovalidateMode.onUserInteraction,
+                validator: (values) => (values == null || values.isEmpty)
+                    ? 'Elige al menos 1 etiqueta'
+                    : null,
+                onChanged: (vals) => tags = vals,
+                onSaved: (vals) => tags = vals ?? [],
+                popupProps: const PopupPropsMultiSelection.menu(
+                  showSearchBox: true,
+                ),
+                decoratorProps: DropDownDecoratorProps(
+                  decoration: const InputDecoration(
+                    labelText: 'Etiquetas',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
               SizedBox(height: size.height * 0.02),
-              
+
               const SizedBox(height: 20),
               CustomButtonWidget(
                 text: 'Enviar',
