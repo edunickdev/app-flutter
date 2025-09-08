@@ -22,7 +22,7 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: const HomeAppBar(
-        title: 'Home Screen',
+        title: 'Vista Principal',
         showThemeToggle: true,
         showColorMenu: true,
       ),

@@ -7,6 +7,7 @@ class FormScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final key = GlobalKey<FormState>();
 
     void onPressed() {
@@ -23,8 +24,9 @@ class FormScreen extends StatelessWidget {
         key: key,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(size.width * 0.05),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 decoration: const InputDecoration(
@@ -39,6 +41,7 @@ class FormScreen extends StatelessWidget {
                   return null;
                 },
               ),
+              SizedBox(height: size.height * 0.02),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Apellidos',
@@ -52,6 +55,7 @@ class FormScreen extends StatelessWidget {
                   return null;
                 },
               ),
+              SizedBox(height: size.height * 0.02),
               
               const SizedBox(height: 20),
               CustomButtonWidget(
