@@ -96,6 +96,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
   }
 
   Future<void> _addAddress(BuildContext context) async {
+    FocusScope.of(context).unfocus();
     final result = await showDialog<AddressEntry>(
       context: context,
       barrierDismissible: false,
@@ -110,6 +111,8 @@ class _FormScreenState extends ConsumerState<FormScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomSpace = bottomInset == 0 ? size.height * 0.15 : 0.0;
 
     return Scaffold(
       appBar: HomeAppBar(title: 'Formulario'),
@@ -147,7 +150,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: size.height * 0.15),
+              SizedBox(height: bottomSpace),
             ],
           ),
         ),
