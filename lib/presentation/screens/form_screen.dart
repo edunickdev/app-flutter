@@ -1,16 +1,20 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:doublevpartnersapp/presentation/context/context.dart';
+
+import 'package:doublevpartnersapp/repository/db/user_dao.dart';
+import 'package:doublevpartnersapp/repository/models/address_model.dart';
+import 'package:doublevpartnersapp/repository/models/user_model.dart';
+
 import 'package:doublevpartnersapp/presentation/components/custom_appbar_widget.dart';
 import 'package:doublevpartnersapp/presentation/components/custom_button_widget.dart';
 import 'package:doublevpartnersapp/presentation/components/custom_snackbar.dart';
+
 import 'package:doublevpartnersapp/presentation/components/form/address_dialog.dart';
 import 'package:doublevpartnersapp/presentation/components/form/address_entry.dart';
 import 'package:doublevpartnersapp/presentation/components/form/address_list.dart';
 import 'package:doublevpartnersapp/presentation/components/form/widgets/name_fields.dart';
-import 'package:doublevpartnersapp/presentation/context/context.dart';
-import 'package:doublevpartnersapp/repository/db/user_dao.dart';
-import 'package:doublevpartnersapp/repository/models/address_model.dart';
-import 'package:doublevpartnersapp/repository/models/user_model.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FormScreen extends ConsumerStatefulWidget {
   const FormScreen({super.key});
