@@ -47,10 +47,15 @@ class AddAddressFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+    final colors = Theme.of(context).colorScheme;
+    return FloatingActionButton.extended(
+      backgroundColor: colors.primary,
+      icon: Icon(Icons.add, color: colors.onPrimary),
+      label: Text(
+        'Agregar dirección',
+        style: TextStyle(color: colors.onPrimary),
+      ),
       onPressed: onPressed,
-      child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
     );
   }
 }

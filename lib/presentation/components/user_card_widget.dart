@@ -18,7 +18,11 @@ class UserCardWidget extends StatelessWidget {
     return Card(
       child: ListTile(
         title: Text('${user.names} ${user.lastnames}'),
-        subtitle: Text('${user.addresses.length} direcciones'),
+        subtitle: Text(
+          user.addresses.length == 1
+              ? '${user.addresses.length} dirección'
+              : '${user.addresses.length} direcciones',
+        ),
         onTap: onTap,
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline),

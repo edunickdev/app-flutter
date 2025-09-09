@@ -76,6 +76,7 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final usersState = ref.watch(usersProvider);
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: HomeAppBar(title: 'Detalles'),
@@ -84,16 +85,19 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
           if (users.isEmpty) {
             return const Center(child: Text('Sin usuarios registrados'));
           }
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (_, index) {
-              final user = users[index];
-              return UserCardWidget(
-                user: user,
-                onTap: () => _showUserDialog(user),
-                onDelete: () => _confirmDelete(user.id),
-              );
-            },
+          return Padding(
+            padding: EdgeInsets.all(size.width * 0.03),
+            child: ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (_, index) {
+                final user = users[index];
+                return UserCardWidget(
+                  user: user,
+                  onTap: () => _showUserDialog(user),
+                  onDelete: () => _confirmDelete(user.id),
+                );
+              },
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),

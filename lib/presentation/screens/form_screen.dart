@@ -45,10 +45,6 @@ class _FormScreenState extends ConsumerState<FormScreen> {
   }
 
   Future<void> _onSubmit(BuildContext context) async {
-    final isValid = _formKey.currentState?.validate() ?? false;
-
-    if (!isValid) return;
-
     if (_addresses.isEmpty) {
       CustomSnackBarWidget.show(
         context,
@@ -57,6 +53,10 @@ class _FormScreenState extends ConsumerState<FormScreen> {
       );
       return;
     }
+
+    final isValid = _formKey.currentState?.validate() ?? false;
+
+    if (!isValid) return;
 
     final user = UserModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -86,6 +86,13 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           : 'Error al guardar el usuario',
       isError: !success,
     );
+
+    if (success) {
+      _formKey.currentState?.reset();
+      _namesKey.currentState?.reset();
+      _lastnamesKey.currentState?.reset();
+      setState(() => _addresses.clear());
+    }
   }
 
   Future<void> _addAddress(BuildContext context) async {
@@ -126,15 +133,21 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                 ),
               ),
               SizedBox(height: size.height * 0.02),
-              CustomButtonWidget(
-                text: 'Guardar usuario',
-                size: size,
-                function: () {
-                  _onSubmit(context);
-                },
-                currentColor: Theme.of(context).colorScheme,
+              Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: size.width * 0.75,
+                  child: CustomButtonWidget(
+                    text: 'Guardar usuario',
+                    size: size,
+                    function: () {
+                      _onSubmit(context);
+                    },
+                    currentColor: Theme.of(context).colorScheme,
+                  ),
+                ),
               ),
-              SizedBox(height: size.height * 0.12),
+              SizedBox(height: size.height * 0.15),
             ],
           ),
         ),
