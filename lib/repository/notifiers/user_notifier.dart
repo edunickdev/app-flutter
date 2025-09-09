@@ -1,16 +1,43 @@
+import 'package:doublevpartnersapp/repository/controllers/user_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ClassName extends StateNotifier<AsyncValue<List<String>>> {
-  ClassName() : super(const AsyncValue.loading());
+class UserNotifier extends StateNotifier<AsyncValue<List<String>>> {
+  UserNotifier() : super(const AsyncValue.loading());
+
+  final UserController _userController = UserController();
 
   Future<void> fetchData() async {
     try {
-      // Simula una llamada a un servicio que obtiene datos
-      await Future.delayed(const Duration(seconds: 2));
-      final data = ['Item 1', 'Item 2', 'Item 3']; // Reemplaza con datos reales
+      final data = await _userController.fetchUserData();
       state = AsyncValue.data(data);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+
+  Future<void> fetchDepartments(String country) async {
+    try {
+      final data = await _userController.fetchDepartments(country);
+      state = AsyncValue.data(data);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> fetchMunicipalities(String department) async {
+    try {
+      final data = await _userController.fetchMunicipalities(department);
+      state = AsyncValue.data(data);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  void clearData() {
+    state = const AsyncValue.data([]);
+  }
+
+  void reset() {
+    state = const AsyncValue.loading();
   }
 }
