@@ -49,8 +49,6 @@ class UserController {
       );
 
       if (response.statusCode == 200) {
-        print("respuesta de openai: ${response.data}");
-
         final List<dynamic> data = response.data['choices'];
         return List<String>.from(data.map((item) => item['text']));
       } else {

@@ -10,13 +10,18 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 final modeProvider = StateProvider<bool>((ref) => false);
 final colorProvider = StateProvider<int>((ref) => 0);
 
-final countriesProvider = StateNotifierProvider<UserNotifier, AsyncValue<List<String>>>((ref) {
-  final notifier = UserNotifier();
-  notifier.fetchData();
-  return notifier;
-});
-final departmentsProvider = StateProvider<List<String>>((ref) => []);
-final municipalitiesProvider = StateProvider<List<String>>((ref) => []);
+final countriesProvider =
+    StateNotifierProvider<UserNotifier, AsyncValue<List<String>>>((ref) {
+      return UserNotifier();
+    });
+final departmentsProvider =
+    StateNotifierProvider<UserNotifier, AsyncValue<List<String>>>((ref) {
+      return UserNotifier();
+    });
+final municipalitiesProvider =
+    StateNotifierProvider<UserNotifier, AsyncValue<List<String>>>((ref) {
+      return UserNotifier();
+    });
 
 final countrySelectedProvider = StateProvider<String?>((ref) => null);
 final departmentSelectedProvider = StateProvider<String?>((ref) => null);
