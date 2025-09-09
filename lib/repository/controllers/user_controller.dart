@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:doublevpartnersapp/config/constants.dart';
+
 class UserController {
   static final _dio = Dio();
 
@@ -26,13 +27,12 @@ class UserController {
 
   Future<List<String>> fetchDepartments(String country) async {
     try {
-      final response =
-          await _dio.post(statesUrl, data: {'country': country});
+      final response = await _dio.post(statesUrl, data: {'country': country});
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['data']['states'];
-        final departments =
-            List<String>.from(data.map((item) => item['name']))..sort();
+        final departments = List<String>.from(data.map((item) => item['name']))
+          ..sort();
         return departments;
       } else {
         throw Exception('Failed to load departments');
@@ -43,14 +43,13 @@ class UserController {
   }
 
   Future<List<String>> fetchMunicipalities(
-      String country, String department) async {
+    String country,
+    String department,
+  ) async {
     try {
       final response = await _dio.post(
         citiesUrl,
-        data: {
-          'country': country,
-          'state': department,
-        },
+        data: {'country': country, 'state': department},
       );
 
       if (response.statusCode == 200) {

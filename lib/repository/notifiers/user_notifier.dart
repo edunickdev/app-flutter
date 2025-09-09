@@ -28,8 +28,10 @@ class UserNotifier extends StateNotifier<AsyncValue<List<String>>> {
   Future<void> fetchMunicipalities(String country, String department) async {
     state = const AsyncValue.loading();
     try {
-      final data =
-          await _userController.fetchMunicipalities(country, department);
+      final data = await _userController.fetchMunicipalities(
+        country,
+        department,
+      );
       state = AsyncValue.data(data);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

@@ -80,9 +80,10 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               // País
               countries.when(
                 data: (data) => DropdownSearch<String>(
-                  items: data,
-                  selectedItem:
-                      ref.watch(countrySelectedProvider.notifier).state,
+                  items: (filter, loadProps) => data,
+                  selectedItem: ref
+                      .watch(countrySelectedProvider.notifier)
+                      .state,
                   autoValidateMode: AutovalidateMode.onUnfocus,
                   validator: (value) =>
                       value == null ? 'Seleccione un país' : null,
@@ -92,13 +93,11 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                       ref
                           .read(departmentsProvider.notifier)
                           .fetchDepartments(value);
-                      ref
-                          .read(departmentSelectedProvider.notifier)
-                          .state = null;
+                      ref.read(departmentSelectedProvider.notifier).state =
+                          null;
                       ref.read(municipalitiesProvider.notifier).clearData();
-                      ref
-                          .read(municipalitySelectedProvider.notifier)
-                          .state = null;
+                      ref.read(municipalitySelectedProvider.notifier).state =
+                          null;
                     }
                   },
                   popupProps: const PopupProps.menu(showSearchBox: true),
@@ -109,9 +108,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                     ),
                   ),
                 ),
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => const Text('Error al cargar países'),
               ),
 
@@ -120,7 +117,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               // Departamento
               departments.when(
                 data: (data) => DropdownSearch<String>(
-                  items: data,
+                  items: (filter, loadProps) => data,
                   selectedItem: ref
                       .watch(departmentSelectedProvider.notifier)
                       .state,
@@ -128,18 +125,17 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                   validator: (value) =>
                       value == null ? 'Seleccione un departamento' : null,
                   onChanged: (value) {
-                    ref.read(departmentSelectedProvider.notifier).state =
-                        value;
+                    ref.read(departmentSelectedProvider.notifier).state = value;
                     if (value != null) {
-                      final country =
-                          ref.read(countrySelectedProvider.notifier).state;
+                      final country = ref
+                          .read(countrySelectedProvider.notifier)
+                          .state;
                       if (country != null) {
                         ref
                             .read(municipalitiesProvider.notifier)
                             .fetchMunicipalities(country, value);
-                        ref
-                            .read(municipalitySelectedProvider.notifier)
-                            .state = null;
+                        ref.read(municipalitySelectedProvider.notifier).state =
+                            null;
                       }
                     }
                   },
@@ -151,9 +147,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                     ),
                   ),
                 ),
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => const Text('Error al cargar departamentos'),
               ),
 
@@ -162,7 +156,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               // Municipio
               municipalities.when(
                 data: (data) => DropdownSearch<String>(
-                  items: data,
+                  items: (filter, loadProps) => data,
                   selectedItem: ref
                       .watch(municipalitySelectedProvider.notifier)
                       .state,
@@ -170,9 +164,8 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                   validator: (value) =>
                       value == null ? 'Seleccione un municipio' : null,
                   onChanged: (value) {
-                    ref
-                        .read(municipalitySelectedProvider.notifier)
-                        .state = value;
+                    ref.read(municipalitySelectedProvider.notifier).state =
+                        value;
                   },
                   popupProps: const PopupProps.menu(showSearchBox: true),
                   decoratorProps: const DropDownDecoratorProps(
@@ -182,9 +175,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                     ),
                   ),
                 ),
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => const Text('Error al cargar municipios'),
               ),
 
