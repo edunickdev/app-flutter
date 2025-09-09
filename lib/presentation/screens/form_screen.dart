@@ -1,10 +1,14 @@
 import 'package:doublevpartnersapp/presentation/components/custom_appbar_widget.dart';
 import 'package:doublevpartnersapp/presentation/components/custom_button_widget.dart';
+import 'package:doublevpartnersapp/presentation/components/custom_snackbar.dart';
 import 'package:doublevpartnersapp/presentation/components/form/address_dialog.dart';
 import 'package:doublevpartnersapp/presentation/components/form/address_entry.dart';
 import 'package:doublevpartnersapp/presentation/components/form/address_list.dart';
 import 'package:doublevpartnersapp/presentation/components/form/widgets/name_fields.dart';
 import 'package:doublevpartnersapp/presentation/context/context.dart';
+import 'package:doublevpartnersapp/repository/db/user_dao.dart';
+import 'package:doublevpartnersapp/repository/models/address_model.dart';
+import 'package:doublevpartnersapp/repository/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,21 +40,48 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     });
   }
 
-  void _onSubmit(BuildContext context) {
+  Future<void> _onSubmit(BuildContext context) async {
     final isValid = _formKey.currentState?.validate() ?? false;
 
     if (!isValid) return;
 
     if (_addresses.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agregue al menos una dirección')),
+      CustomSnackBarWidget.show(
+        context,
+        'Agregue al menos una dirección',
+        isError: true,
       );
       return;
     }
 
-    ScaffoldMessenger.of(
+    final user = UserModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      names: _namesKey.currentState?.value ?? '',
+      lastnames: _lastnamesKey.currentState?.value ?? '',
+      addresses: _addresses
+          .map(
+            (a) => AddressModel(
+              country: a.country,
+              department: a.department,
+              municipality: a.municipality,
+              address: a.address,
+            ),
+          )
+          .toList(),
+    );
+
+    final dao = UserDao(ref.read(databaseProvider));
+    final success = await dao.insertUser(user);
+
+    if (!context.mounted) return;
+
+    CustomSnackBarWidget.show(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Procesando datos')));
+      success
+          ? 'Usuario guardado correctamente'
+          : 'Error al guardar el usuario',
+      isError: !success,
+    );
   }
 
   Future<void> _addAddress(BuildContext context) async {
@@ -94,7 +125,9 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               CustomButtonWidget(
                 text: 'Guardar usuario',
                 size: size,
-                function: () => _onSubmit(context),
+                function: () {
+                  _onSubmit(context);
+                },
                 currentColor: Theme.of(context).colorScheme,
               ),
               SizedBox(height: size.height * 0.12),

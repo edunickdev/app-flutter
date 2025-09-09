@@ -1,26 +1,31 @@
 class AddressModel {
-  final String street;
-  final String city;
-  final String state;
-  final String zipCode;
+  final String country;
+  final String department;
+  final String municipality;
+  final String address;
 
   AddressModel({
-    required this.street,
-    required this.city,
-    required this.state,
-    required this.zipCode,
+    required this.country,
+    required this.department,
+    required this.municipality,
+    required this.address,
   });
 
   factory AddressModel.fromJson(Map<String, dynamic> json) {
     return AddressModel(
-      street: json['street'] ?? '',
-      city: json['city'] ?? '',
-      state: json['state'] ?? '',
-      zipCode: json['zipCode'] ?? '',
+      country: json['country'] ?? '',
+      department: json['department'] ?? '',
+      municipality: json['municipality'] ?? '',
+      address: json['address'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'street': street, 'city': city, 'state': state, 'zipCode': zipCode};
+    return {
+      'country': country,
+      'department': department,
+      'municipality': municipality,
+      'address': address,
+    };
   }
 }

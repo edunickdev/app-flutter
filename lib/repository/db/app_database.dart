@@ -35,10 +35,10 @@ class AppDatabase {
       CREATE TABLE addresses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId TEXT NOT NULL,
-        street TEXT,
-        city TEXT,
-        state TEXT,
-        zipCode TEXT,
+        country TEXT NOT NULL,
+        department TEXT NOT NULL,
+        municipality TEXT NOT NULL,
+        address TEXT NOT NULL,
         FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
       )
     ''');
