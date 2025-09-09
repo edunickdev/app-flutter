@@ -1,4 +1,4 @@
-package com.example.doublevpartnersapp
+package com.nicolassarmiento.doublevpartners
 
 import io.flutter.embedding.android.FlutterActivity
 
