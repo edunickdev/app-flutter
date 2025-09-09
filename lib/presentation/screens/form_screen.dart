@@ -16,7 +16,11 @@ class _FormScreenState extends ConsumerState<FormScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(countriesProvider.notifier).fetchData());
+    Future.microtask(() {
+      ref.read(countriesProvider.notifier).fetchData();
+      ref.read(departmentsProvider.notifier).clearData();
+      ref.read(municipalitiesProvider.notifier).clearData();
+    });
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -74,96 +78,114 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               SizedBox(height: size.height * 0.02),
 
               // País
-              DropdownSearch<String>(
-                items: (filter, loadProps) => countries.when(
-                  data: (data) => data,
-                  loading: () => [],
-                  error: (e, st) => [],
-                ),
-                selectedItem: ref.watch(countrySelectedProvider.notifier).state,
-                autoValidateMode: AutovalidateMode.onUnfocus,
-                validator: (value) =>
-                    value == null ? 'Seleccione un país' : null,
-                onChanged: (value) {
-                  ref.read(countrySelectedProvider.notifier).state = value;
-                  if (value != null) {
-                    ref
-                        .read(departmentsProvider.notifier)
-                        .fetchDepartments(value);
-                    ref.read(departmentSelectedProvider.notifier).state = null;
-                    ref.read(municipalitiesProvider.notifier).clearData();
-                    ref.read(municipalitySelectedProvider.notifier).state =
-                        null;
-                  }
-                },
-                popupProps: const PopupProps.menu(showSearchBox: true),
-                decoratorProps: const DropDownDecoratorProps(
-                  decoration: InputDecoration(
-                    labelText: 'País',
-                    border: OutlineInputBorder(),
+              countries.when(
+                data: (data) => DropdownSearch<String>(
+                  items: data,
+                  selectedItem:
+                      ref.watch(countrySelectedProvider.notifier).state,
+                  autoValidateMode: AutovalidateMode.onUnfocus,
+                  validator: (value) =>
+                      value == null ? 'Seleccione un país' : null,
+                  onChanged: (value) {
+                    ref.read(countrySelectedProvider.notifier).state = value;
+                    if (value != null) {
+                      ref
+                          .read(departmentsProvider.notifier)
+                          .fetchDepartments(value);
+                      ref
+                          .read(departmentSelectedProvider.notifier)
+                          .state = null;
+                      ref.read(municipalitiesProvider.notifier).clearData();
+                      ref
+                          .read(municipalitySelectedProvider.notifier)
+                          .state = null;
+                    }
+                  },
+                  popupProps: const PopupProps.menu(showSearchBox: true),
+                  decoratorProps: const DropDownDecoratorProps(
+                    decoration: InputDecoration(
+                      labelText: 'País',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (e, st) => const Text('Error al cargar países'),
               ),
 
               SizedBox(height: size.height * 0.02),
 
               // Departamento
-              DropdownSearch<String>(
-                items: (filter, loadProps) => departments.when(
-                  data: (data) => data,
-                  loading: () => [],
-                  error: (e, st) => [],
-                ),
-                selectedItem: ref
-                    .watch(departmentSelectedProvider.notifier)
-                    .state,
-                autoValidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) =>
-                    value == null ? 'Seleccione un departamento' : null,
-                onChanged: (value) {
-                  ref.read(departmentSelectedProvider.notifier).state = value;
-                  if (value != null) {
-                    ref
-                        .read(municipalitiesProvider.notifier)
-                        .fetchMunicipalities(value);
-                    ref.read(municipalitySelectedProvider.notifier).state =
-                        null;
-                  }
-                },
-                popupProps: const PopupProps.menu(showSearchBox: true),
-                decoratorProps: const DropDownDecoratorProps(
-                  decoration: InputDecoration(
-                    labelText: 'Departamento',
-                    border: OutlineInputBorder(),
+              departments.when(
+                data: (data) => DropdownSearch<String>(
+                  items: data,
+                  selectedItem: ref
+                      .watch(departmentSelectedProvider.notifier)
+                      .state,
+                  autoValidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) =>
+                      value == null ? 'Seleccione un departamento' : null,
+                  onChanged: (value) {
+                    ref.read(departmentSelectedProvider.notifier).state =
+                        value;
+                    if (value != null) {
+                      final country =
+                          ref.read(countrySelectedProvider.notifier).state;
+                      if (country != null) {
+                        ref
+                            .read(municipalitiesProvider.notifier)
+                            .fetchMunicipalities(country, value);
+                        ref
+                            .read(municipalitySelectedProvider.notifier)
+                            .state = null;
+                      }
+                    }
+                  },
+                  popupProps: const PopupProps.menu(showSearchBox: true),
+                  decoratorProps: const DropDownDecoratorProps(
+                    decoration: InputDecoration(
+                      labelText: 'Departamento',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (e, st) => const Text('Error al cargar departamentos'),
               ),
 
               SizedBox(height: size.height * 0.02),
 
               // Municipio
-              DropdownSearch<String>(
-                items: (filter, loadProps) => municipalities.when(
-                  data: (data) => data,
-                  loading: () => [],
-                  error: (e, st) => [],
-                ),
-                selectedItem: ref
-                    .watch(municipalitySelectedProvider.notifier)
-                    .state,
-                autoValidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) =>
-                    value == null ? 'Seleccione un municipio' : null,
-                onChanged: (value) {
-                  ref.read(municipalitySelectedProvider.notifier).state = value;
-                },
-                popupProps: const PopupProps.menu(showSearchBox: true),
-                decoratorProps: const DropDownDecoratorProps(
-                  decoration: InputDecoration(
-                    labelText: 'Municipio',
-                    border: OutlineInputBorder(),
+              municipalities.when(
+                data: (data) => DropdownSearch<String>(
+                  items: data,
+                  selectedItem: ref
+                      .watch(municipalitySelectedProvider.notifier)
+                      .state,
+                  autoValidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) =>
+                      value == null ? 'Seleccione un municipio' : null,
+                  onChanged: (value) {
+                    ref
+                        .read(municipalitySelectedProvider.notifier)
+                        .state = value;
+                  },
+                  popupProps: const PopupProps.menu(showSearchBox: true),
+                  decoratorProps: const DropDownDecoratorProps(
+                    decoration: InputDecoration(
+                      labelText: 'Municipio',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (e, st) => const Text('Error al cargar municipios'),
               ),
 
               SizedBox(height: size.height * 0.02),

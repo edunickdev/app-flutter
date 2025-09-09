@@ -19,18 +19,17 @@ class UserNotifier extends StateNotifier<AsyncValue<List<String>>> {
     state = const AsyncValue.loading();
     try {
       final data = await _userController.fetchDepartments(country);
-      print("estos son los departamentos que estoy obteniendo: $data");
       state = AsyncValue.data(data);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
 
-  Future<void> fetchMunicipalities(String department) async {
+  Future<void> fetchMunicipalities(String country, String department) async {
     state = const AsyncValue.loading();
     try {
-      final data = await _userController.fetchMunicipalities(department);
-      print("estos son los municipios que estoy obteniendo: $data");
+      final data =
+          await _userController.fetchMunicipalities(country, department);
       state = AsyncValue.data(data);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
