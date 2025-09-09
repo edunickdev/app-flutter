@@ -1,19 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:doublevpartnersapp/config/constants.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class UserController {
   static final _dio = Dio();
-  static final String apiKey =
-      dotenv.env['OPENAI_API_KEY'] ?? 'No se cargo el ApiKey';
-  static const String model = 'gpt-5';
-
-  static final headers = Options(
-    headers: {
-      'Authorization': 'Bearer $apiKey',
-      'Content-Type': 'application/json',
-    },
-  );
 
   Future<List<String>> fetchUserData() async {
     try {
@@ -38,19 +26,14 @@ class UserController {
 
   Future<List<String>> fetchDepartments(String country) async {
     try {
-      final response = await _dio.post(
-        openaiUrl,
-        data: {
-          'model': model,
-          'input':
-              'Give me 5 principal departments of $country like a list of string, be sure to include the department names only and the text returned is only a list exactly, no more text.',
-        },
-        options: headers,
-      );
+      final response =
+          await _dio.post(statesUrl, data: {'country': country});
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['choices'];
-        return List<String>.from(data.map((item) => item['text']));
+        final List<dynamic> data = response.data['data']['states'];
+        final departments =
+            List<String>.from(data.map((item) => item['name']))..sort();
+        return departments;
       } else {
         throw Exception('Failed to load departments');
       }
@@ -59,21 +42,21 @@ class UserController {
     }
   }
 
-  Future<List<String>> fetchMunicipalities(String department) async {
+  Future<List<String>> fetchMunicipalities(
+      String country, String department) async {
     try {
       final response = await _dio.post(
-        openaiUrl,
+        citiesUrl,
         data: {
-          'model': model,
-          'input':
-              'Give me 5 principal municipalities of $department like a list of string, be sure to include the municipality names only and the text returned is only a list exactly, no more text.',
+          'country': country,
+          'state': department,
         },
-        options: headers,
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['choices'];
-        return List<String>.from(data.map((item) => item['text']));
+        final List<dynamic> data = response.data['data'];
+        final municipalities = List<String>.from(data)..sort();
+        return municipalities;
       } else {
         throw Exception('Failed to load municipalities');
       }
