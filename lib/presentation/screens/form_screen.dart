@@ -1,7 +1,10 @@
 import 'package:doublevpartnersapp/presentation/components/custom_appbar_widget.dart';
 import 'package:doublevpartnersapp/presentation/components/custom_button_widget.dart';
+import 'package:doublevpartnersapp/presentation/components/form/address_dialog.dart';
+import 'package:doublevpartnersapp/presentation/components/form/address_entry.dart';
+import 'package:doublevpartnersapp/presentation/components/form/address_list.dart';
+import 'package:doublevpartnersapp/presentation/components/form/widgets/name_fields.dart';
 import 'package:doublevpartnersapp/presentation/context/context.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,39 +16,58 @@ class FormScreen extends ConsumerStatefulWidget {
 }
 
 class _FormScreenState extends ConsumerState<FormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _namesKey = GlobalKey<FormFieldState>();
+  final _lastnamesKey = GlobalKey<FormFieldState>();
+
+  final List<AddressEntry> _addresses = [];
+
   @override
   void initState() {
     super.initState();
+    // Carga inicial y limpieza controlada
     Future.microtask(() {
       ref.read(countriesProvider.notifier).fetchData();
       ref.read(municipalitiesProvider.notifier).clearData();
+      // Opcional: limpiar selección
+      ref.read(countrySelectedProvider.notifier).state = null;
+      ref.read(departmentSelectedProvider.notifier).state = null;
+      ref.read(municipalitySelectedProvider.notifier).state = null;
     });
   }
 
-  final _formKey = GlobalKey<FormState>();
+  void _onSubmit(BuildContext context) {
+    final isValid = _formKey.currentState?.validate() ?? false;
 
-  void _onPressed(BuildContext context) {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Procesando datos')));
+    if (!isValid) return;
+
+    if (_addresses.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agregue al menos una dirección')),
+      );
+      return;
     }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Procesando datos')));
   }
 
-  String? _validateNotEmpty(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'El campo no puede estar vacío';
+  Future<void> _addAddress(BuildContext context) async {
+    final result = await showDialog<AddressEntry>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AddressDialog(),
+    );
+
+    if (result != null) {
+      setState(() => _addresses.add(result));
     }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
-    final countries = ref.watch(countriesProvider);
-    final departments = ref.watch(departmentsProvider);
-    final municipalities = ref.watch(municipalitiesProvider);
 
     return Scaffold(
       appBar: HomeAppBar(title: 'Formulario'),
@@ -57,136 +79,31 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Nombres',
-                  hintText: 'Ingrese sus nombres',
-                  border: OutlineInputBorder(),
-                ),
-                validator: _validateNotEmpty,
-              ),
+              NameFields(namesKey: _namesKey, lastnamesKey: _lastnamesKey),
               SizedBox(height: size.height * 0.02),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Apellidos',
-                  hintText: 'Ingrese sus apellidos',
-                  border: OutlineInputBorder(),
-                ),
-                validator: _validateNotEmpty,
-              ),
-              SizedBox(height: size.height * 0.02),
-
-              // País
-              countries.when(
-                data: (data) => DropdownSearch<String>(
-                  items: (filter, loadProps) => data.keys.toList(),
-                  selectedItem: ref
-                      .watch(countrySelectedProvider.notifier)
-                      .state,
-                  autoValidateMode: AutovalidateMode.onUnfocus,
-                  validator: (value) =>
-                      value == null ? 'Seleccione un país' : null,
-                  onChanged: (value) {
-                    ref.read(countrySelectedProvider.notifier).state = value;
-                    if (value != null) {
-                      ref.read(departmentSelectedProvider.notifier).state =
-                          null;
-                      ref.read(municipalitiesProvider.notifier).clearData();
-                      ref.read(municipalitySelectedProvider.notifier).state =
-                          null;
-                    }
+              const Text('Direcciones agregadas'),
+              Expanded(
+                child: AddressList(
+                  addresses: _addresses,
+                  onDelete: (index) {
+                    setState(() => _addresses.removeAt(index));
                   },
-                  popupProps: const PopupProps.menu(showSearchBox: true),
-                  decoratorProps: const DropDownDecoratorProps(
-                    decoration: InputDecoration(
-                      labelText: 'País',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
                 ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, st) => const Text('Error al cargar países'),
               ),
-
               SizedBox(height: size.height * 0.02),
-
-              // Departamento
-              departments.when(
-                data: (data) => DropdownSearch<String>(
-                  items: (filter, loadProps) => data,
-                  selectedItem: ref
-                      .watch(departmentSelectedProvider.notifier)
-                      .state,
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) =>
-                      value == null ? 'Seleccione un departamento' : null,
-                  onChanged: (value) {
-                    ref.read(departmentSelectedProvider.notifier).state = value;
-                    if (value != null) {
-                      final country = ref
-                          .read(countrySelectedProvider.notifier)
-                          .state;
-                      if (country != null) {
-                        ref
-                            .read(municipalitiesProvider.notifier)
-                            .fetchMunicipalities(country, value);
-                        ref.read(municipalitySelectedProvider.notifier).state =
-                            null;
-                      }
-                    }
-                  },
-                  popupProps: const PopupProps.menu(showSearchBox: true),
-                  decoratorProps: const DropDownDecoratorProps(
-                    decoration: InputDecoration(
-                      labelText: 'Departamento',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, st) => const Text('Error al cargar departamentos'),
-              ),
-
-              SizedBox(height: size.height * 0.02),
-
-              // Municipio
-              municipalities.when(
-                data: (data) => DropdownSearch<String>(
-                  items: (filter, loadProps) => data,
-                  selectedItem: ref
-                      .watch(municipalitySelectedProvider.notifier)
-                      .state,
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) =>
-                      value == null ? 'Seleccione un municipio' : null,
-                  onChanged: (value) {
-                    ref.read(municipalitySelectedProvider.notifier).state =
-                        value;
-                  },
-                  popupProps: const PopupProps.menu(showSearchBox: true),
-                  decoratorProps: const DropDownDecoratorProps(
-                    decoration: InputDecoration(
-                      labelText: 'Municipio',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, st) => const Text('Error al cargar municipios'),
-              ),
-
-              SizedBox(height: size.height * 0.02),
-              const SizedBox(height: 20),
-
               CustomButtonWidget(
-                text: 'Enviar',
+                text: 'Guardar usuario',
                 size: size,
-                function: () => _onPressed(context),
+                function: () => _onSubmit(context),
                 currentColor: Theme.of(context).colorScheme,
               ),
+              SizedBox(height: size.height * 0.12),
             ],
           ),
         ),
+      ),
+      floatingActionButton: AddAddressFab(
+        onPressed: () => _addAddress(context),
       ),
     );
   }
