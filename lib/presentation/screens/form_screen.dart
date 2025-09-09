@@ -18,7 +18,6 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     super.initState();
     Future.microtask(() {
       ref.read(countriesProvider.notifier).fetchData();
-      ref.read(departmentsProvider.notifier).clearData();
       ref.read(municipalitiesProvider.notifier).clearData();
     });
   }
@@ -80,7 +79,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               // País
               countries.when(
                 data: (data) => DropdownSearch<String>(
-                  items: (filter, loadProps) => data,
+                  items: (filter, loadProps) => data.keys.toList(),
                   selectedItem: ref
                       .watch(countrySelectedProvider.notifier)
                       .state,
@@ -90,9 +89,6 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                   onChanged: (value) {
                     ref.read(countrySelectedProvider.notifier).state = value;
                     if (value != null) {
-                      ref
-                          .read(departmentsProvider.notifier)
-                          .fetchDepartments(value);
                       ref.read(departmentSelectedProvider.notifier).state =
                           null;
                       ref.read(municipalitiesProvider.notifier).clearData();

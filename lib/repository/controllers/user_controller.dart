@@ -4,41 +4,30 @@ import 'package:doublevpartnersapp/config/constants.dart';
 class UserController {
   static final _dio = Dio();
 
-  Future<List<String>> fetchUserData() async {
+  Future<Map<String, List<String>>> fetchCountries() async {
     try {
       final response = await _dio.get(apiUrl);
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+        final List<dynamic> data = response.data['data'];
 
-        final temp = List<String>.from(
-          data.map((country) => country['name']['common']),
-        );
+        final Map<String, List<String>> countries = {};
+        for (final country in data) {
+          final String name = country['name'];
+          final List<dynamic> statesData = country['states'] ?? [];
+          final states = List<String>.from(
+            statesData.map((item) => item['name']),
+          )..sort();
+          countries[name] = states;
+        }
 
-        temp.sort();
-
-        return temp;
+        final sortedEntries = countries.entries.toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
+        return Map.fromEntries(sortedEntries);
       } else {
-        throw Exception('Failed to load user data');
+        throw Exception('Failed to load countries');
       }
     } catch (e) {
-      throw Exception('Error fetching user data: $e');
-    }
-  }
-
-  Future<List<String>> fetchDepartments(String country) async {
-    try {
-      final response = await _dio.post(statesUrl, data: {'country': country});
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['data']['states'];
-        final departments = List<String>.from(data.map((item) => item['name']))
-          ..sort();
-        return departments;
-      } else {
-        throw Exception('Failed to load departments');
-      }
-    } catch (e) {
-      throw Exception('Error fetching departments: $e');
+      throw Exception('Error fetching countries: $e');
     }
   }
 
@@ -47,6 +36,8 @@ class UserController {
     String department,
   ) async {
     try {
+      print('Fetching municipalities for $country, $department');
+
       final response = await _dio.post(
         citiesUrl,
         data: {'country': country, 'state': department},
@@ -59,7 +50,9 @@ class UserController {
       } else {
         throw Exception('Failed to load municipalities');
       }
-    } catch (e) {
+    } catch (e, st) {
+      print('Error fetching municipalities: $e');
+      print('Stack trace: $st');
       throw Exception('Error fetching municipalities: $e');
     }
   }
