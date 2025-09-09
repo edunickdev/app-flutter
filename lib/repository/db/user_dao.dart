@@ -32,4 +32,50 @@ class UserDao {
       return false;
     }
   }
+
+  Future<List<UserModel>> getUsers() async {
+    final db = await _appDatabase.database;
+    final userMaps = await db.query('users');
+    List<UserModel> users = [];
+    for (final userMap in userMaps) {
+      final addressMaps = await db.query(
+        'addresses',
+        where: 'userId = ?',
+        whereArgs: [userMap['id']],
+      );
+      final addresses = addressMaps
+          .map((a) => AddressModel.fromJson(a))
+          .toList();
+      users.add(
+        UserModel(
+          id: userMap['id'] as String,
+          names: userMap['names'] as String,
+          lastnames: userMap['lastnames'] as String,
+          addresses: addresses,
+        ),
+      );
+    }
+    return users;
+  }
+
+  Future<bool> deleteUser(String id) async {
+    try {
+      final db = await _appDatabase.database;
+      await db.transaction((txn) async {
+        await txn.delete(
+          'addresses',
+          where: 'userId = ?',
+          whereArgs: [id],
+        );
+        await txn.delete(
+          'users',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
