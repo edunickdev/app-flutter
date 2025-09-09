@@ -23,11 +23,12 @@ class AppTheme {
     : assert(currentColor >= 0 && currentColor < colors.length);
 
   ThemeData getTheme() {
-    ThemeData themeData = ThemeData(
-      colorSchemeSeed: colors[currentColor],
-      brightness: currentMode ? Brightness.dark : Brightness.light,
-    );
+    final brightness = currentMode ? Brightness.dark : Brightness.light;
 
-    return themeData;
+    final colorScheme = brightness == Brightness.dark
+        ? ColorScheme.dark(primary: colors[currentColor])
+        : ColorScheme.light(primary: colors[currentColor]);
+
+    return ThemeData(colorScheme: colorScheme);
   }
 }
